@@ -46,7 +46,8 @@ str_t create(char *initializer) {
     str->len = len;
 
     // copies initializer char array to string
-    for (int i = 0; i < str->len; i++)
+    int str_len = str->len;
+    for (int i = 0; i < str_len; i++)
         *(str->chars + i) = *(initializer + i);
 
     return str;
@@ -79,7 +80,8 @@ int equals(str_t s1, str_t s2) {
         return 0;
 
     // checking char by char to ensure equality
-    for (int i = 0; (i < s1->len) && (i < s2->len); i++) {
+    int s1_len = s1->len, s2_len = s2->len;
+    for (int i = 0; (i < s1_len) && (i < s2_len); i++) {
         if (*(s1->chars + i) != *(s2->chars + i))
             return 0;
     }
@@ -99,7 +101,8 @@ void copy(str_t to, str_t from) {
     to->len = from->len;
 
     // copying over chars into to from from
-    for (int i = 0; i < from->len; i++)
+    int from_len = from->len;
+    for (int i = 0; i < from_len; i++)
         *(to->chars + i) = *(from->chars + i);
 }
 
@@ -110,9 +113,10 @@ void copy(str_t to, str_t from) {
  */
 void censor(str_t orig, str_t bad) {
     // iterate over entire string
-    for (int i = 0; i < orig->len; i++) {
+    int orig_len = orig->len, bad_len = bad->len;
+    for (int i = 0; i < orig_len; i++) {
         // compare the current char in orig with all of the bad chars
-        for (int j = 0; j < bad->len; j++) {
+        for (int j = 0; j < bad_len; j++) {
             // if char in orig is bad
             if (*(orig->chars + i) == *(bad->chars + j)) {
                 // replace the bad character in orig with space
@@ -147,7 +151,8 @@ void append(str_t s1, str_t s2) {
     }
 
     // appending algorithm. Simple for loop.
-    for (int i = 0; i < s2->len; i++) {
+    int s2_len = s2->len;
+    for (int i = 0; i < s2_len; i++) {
         *(s1->chars + s1->len) = *(s2->chars + i);
         s1->len++;
     }
@@ -194,8 +199,11 @@ void edit(str_t targ, str_t rpl, str_t orig) {
     if (length(targ) < 1 || length(rpl) < 0 || length(orig) < 1)
         return;
 
-    /* Scan orig for targ */
-    for (int i = 0; i < orig->len - targ->len + 1; i++) {
+    /* Hoist len calculation out of the loop */
+    int targ_len = targ->len;
+
+    /* Scan orig for targ. orig->len cannot be hoisted as it can change size. */
+    for (int i = 0; i < orig->len - targ_len + 1; i++) {
         /* Make a substring of the original string with the length of the target length */
         str_t substr = substring(orig, i, targ->len);
         if (equals(targ, substr)) {
